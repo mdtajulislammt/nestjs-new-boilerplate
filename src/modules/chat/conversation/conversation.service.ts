@@ -3,7 +3,7 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import appConfig from '../../../config/app.config';
-import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../../common/lib/Disk/SojebStorage';
 import { DateHelper } from '../../../common/helper/date.helper';
 
 @Injectable()
@@ -52,7 +52,7 @@ export class ConversationService {
             name: p.user.name,
             avatar: p.user.avatar,
             avatar_url: p.user.avatar
-              ? SojebStorage.url(
+              ? TanvirStorage.url(
                   `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
                 )
               : null,
@@ -90,7 +90,7 @@ export class ConversationService {
         name: p.user.name,
         avatar: p.user.avatar,
         avatar_url: p.user.avatar
-          ? SojebStorage.url(
+          ? TanvirStorage.url(
               `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
             )
           : null,
@@ -131,7 +131,7 @@ export class ConversationService {
         name: p.user.name,
         avatar: p.user.avatar,
         avatar_url: p.user.avatar
-          ? SojebStorage.url(
+          ? TanvirStorage.url(
               `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
             )
           : null,
@@ -172,7 +172,7 @@ export class ConversationService {
         name: p.user.name,
         avatar: p.user.avatar,
         avatar_url: p.user.avatar
-          ? SojebStorage.url(
+          ? TanvirStorage.url(
               `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
             )
           : null,

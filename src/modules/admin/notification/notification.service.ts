@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../../common/lib/Disk/SojebStorage';
 import appConfig from '../../../config/app.config';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 import { UserType } from 'prisma/generated/client';
@@ -67,13 +67,13 @@ export class NotificationService {
       if (notifications.length > 0) {
         for (const notification of notifications) {
           if (notification.sender && notification.sender.avatar) {
-            notification.sender['avatar_url'] = SojebStorage.url(
+            notification.sender['avatar_url'] = TanvirStorage.url(
               appConfig().storageUrl.avatar + '/' + notification.sender.avatar,
             );
           }
 
           if (notification.receiver && notification.receiver.avatar) {
-            notification.receiver['avatar_url'] = SojebStorage.url(
+            notification.receiver['avatar_url'] = TanvirStorage.url(
               appConfig().storageUrl.avatar + '/' + notification.receiver.avatar,
             );
           }

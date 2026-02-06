@@ -7,7 +7,7 @@ import Redis from 'ioredis';
 //internal imports
 import { DateHelper } from '../../common/helper/date.helper';
 import { StringHelper } from '../../common/helper/string.helper';
-import { SojebStorage } from '../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../common/lib/Disk/SojebStorage';
 import { StripePayment } from '../../common/lib/Payment/stripe/StripePayment';
 import { UcodeRepository } from '../../common/repository/ucode/ucode.repository';
 import { UserRepository } from '../../common/repository/user/user.repository';
@@ -52,7 +52,7 @@ export class AuthService {
       }
 
       if (user.avatar) {
-        user['avatar_url'] = SojebStorage.url(
+        user['avatar_url'] = TanvirStorage.url(
           appConfig().storageUrl.avatar + '/' + user.avatar,
         );
       }
@@ -256,14 +256,14 @@ export class AuthService {
           select: { avatar: true },
         });
         if (oldImage.avatar) {
-          await SojebStorage.delete(
+          await TanvirStorage.delete(
             appConfig().storageUrl.avatar + '/' + oldImage.avatar,
           );
         }
 
         // upload file
         const fileName = `${StringHelper.randomString()}${image.originalname}`;
-        await SojebStorage.put(
+        await TanvirStorage.put(
           appConfig().storageUrl.avatar + '/' + fileName,
           image.buffer,
         );

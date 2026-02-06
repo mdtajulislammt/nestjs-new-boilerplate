@@ -9,7 +9,7 @@ import { IStorage } from './drivers/iStorage';
  * @class SojebStorage
  * @author Sojeb Sikder <sojebsikder@gmail.com>
  */
-export class SojebStorage {
+export class TanvirStorage {
   private static _config: DiskOption;
 
   /**

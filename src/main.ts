@@ -10,8 +10,9 @@ import { join, resolve } from 'path';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { CustomExceptionFilter } from './common/exception/custom-exception.filter';
-import { SojebStorage } from './common/lib/Disk/SojebStorage';
+import { TanvirStorage } from './common/lib/Disk/SojebStorage';
 import appConfig from './config/app.config';
+import { PrismaExceptionFilter } from './common/exception/prisma-exception.filter';
 
 async function bootstrap() {
  
@@ -45,10 +46,14 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalFilters(new CustomExceptionFilter());
+  
+  app.useGlobalFilters(
+    new CustomExceptionFilter(),
+    new PrismaExceptionFilter(),  
+  );
 
   // storage setup
-  SojebStorage.config({
+  TanvirStorage.config({
     driver: 'local',
     connection: {
       rootUrl: appConfig().storageUrl.rootUrl,
