@@ -16,6 +16,7 @@ const STRIPE_WEBHOOK_SECRET = appConfig().payment.stripe.webhook_secret;
  * Stripe payment method helper
  */
 export class StripePayment {
+ 
   static async createPaymentMethod({
     card,
     billing_details,

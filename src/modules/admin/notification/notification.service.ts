@@ -3,7 +3,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
 import appConfig from '../../../config/app.config';
 import { UserRepository } from '../../../common/repository/user/user.repository';
-import { Role } from '../../../common/guard/role/role.enum';
+import { UserType } from 'prisma/generated/client';
 
 @Injectable()
 export class NotificationService {
@@ -17,7 +17,7 @@ export class NotificationService {
       const where_condition = {};
       const userDetails = await this.userRepository.getUserDetails(user_id);
 
-      if (userDetails.type == Role.ADMIN) {
+      if (userDetails.type == UserType.ADMIN) {
         where_condition['OR'] = [
           { receiver_id: { equals: user_id } },
           { receiver_id: { equals: null } },
@@ -68,13 +68,13 @@ export class NotificationService {
         for (const notification of notifications) {
           if (notification.sender && notification.sender.avatar) {
             notification.sender['avatar_url'] = SojebStorage.url(
-              appConfig().storageUrl.avatar + notification.sender.avatar,
+              appConfig().storageUrl.avatar + '/' + notification.sender.avatar,
             );
           }
 
           if (notification.receiver && notification.receiver.avatar) {
             notification.receiver['avatar_url'] = SojebStorage.url(
-              appConfig().storageUrl.avatar + notification.receiver.avatar,
+              appConfig().storageUrl.avatar + '/' + notification.receiver.avatar,
             );
           }
         }
