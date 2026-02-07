@@ -213,42 +213,15 @@ export class AuthService {
   ) {
     try {
       const data: any = {};
-      if (updateUserDto.name) {
-        data.name = updateUserDto.name;
-      }
-      if (updateUserDto.first_name) {
-        data.first_name = updateUserDto.first_name;
-      }
-      if (updateUserDto.last_name) {
-        data.last_name = updateUserDto.last_name;
-      }
-      if (updateUserDto.phone_number) {
-        data.phone_number = updateUserDto.phone_number;
-      }
-      if (updateUserDto.country) {
-        data.country = updateUserDto.country;
-      }
-      if (updateUserDto.state) {
-        data.state = updateUserDto.state;
-      }
-      if (updateUserDto.local_government) {
-        data.local_government = updateUserDto.local_government;
-      }
-      if (updateUserDto.city) {
-        data.city = updateUserDto.city;
-      }
-      if (updateUserDto.zip_code) {
-        data.zip_code = updateUserDto.zip_code;
-      }
-      if (updateUserDto.address) {
-        data.address = updateUserDto.address;
-      }
-      if (updateUserDto.gender) {
-        data.gender = updateUserDto.gender;
-      }
-      if (updateUserDto.date_of_birth) {
-        data.date_of_birth = DateHelper.format(updateUserDto.date_of_birth);
-      }
+
+      if (updateUserDto.name) data.name = updateUserDto.name;
+      
+      if (updateUserDto.first_name) data.first_name = updateUserDto.first_name;
+      
+      if (updateUserDto.last_name) data.last_name = updateUserDto.last_name;
+      
+      if (updateUserDto.address) data.address = updateUserDto.address;
+          
       if (image) {
         // delete old image from storage
         const oldImage = await this.prisma.user.findFirst({
@@ -262,7 +235,7 @@ export class AuthService {
         }
 
         // upload file
-        const fileName = `${StringHelper.randomString()}${image.originalname}`;
+        const fileName = `${StringHelper.randomString()}_${image.originalname}`;
         await TanvirStorage.put(
           appConfig().storageUrl.avatar + '/' + fileName,
           image.buffer,

@@ -27,13 +27,9 @@ async function bootstrap() {
   app.use(helmet());
  
 
-  app.useStaticAssets(join(__dirname, "..", "public"), {
+  app.useStaticAssets(join(__dirname, "..", "..", "public"), {
     index: false,
     prefix: "/public",
-  });
-  app.useStaticAssets(join(__dirname, "..", "public/storage"), {
-    index: false,
-    prefix: "/storage",
   });
 
   app.useGlobalPipes(
