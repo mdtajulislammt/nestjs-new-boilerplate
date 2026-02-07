@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TanvirStorage } from './common/lib/Disk/SojebStorage';
+import { TanvirStorage } from './common/lib/Disk/TanvirStorage';
 
 @Injectable()
 export class AppService {

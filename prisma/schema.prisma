@@ -87,13 +87,14 @@ model User {
 
   // --- Conversation & Messaging ---
   participants Participant[] @relation("participantUser")
+  sentMessages Message[] @relation("messageSender")
 
-  receiver_notifications Notification[] @relation("receiver")
-  sender_notifications   Notification[] @relation("sender")
+  // --- Notifications ---
+  receivedNotifications Notification[] @relation("notificationReceiver")
+  sentNotifications Notification[] @relation("notificationSender")
 
   user_payment_methods UserPaymentMethod[]
   ucodes               Ucode[]
-  roles                Role[]
   role_users           RoleUser[]
   payment_transactions PaymentTransaction[]
 
@@ -117,6 +118,102 @@ model Ucode {
   @@map("ucodes")
 }
 
+
+/*---------------------------------------------------------------------
+                      Chating and Notification Schema start
+---------------------------------------------------------------------*/
+
+model Conversation {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  messages     Message[]
+  participants Participant[]
+}
+
+model Participant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation("participantUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  role     String?  @default("participant")
+  joinedAt DateTime @default(now())
+
+  lastReadAt DateTime?
+
+  @@unique([conversationId, userId])
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  PENDING
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  text      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status MessageStatus @default(PENDING)
+
+  senderId String
+  sender   User   @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  attachments String[] @db.Text
+}
+
+
+// -------------------------notification schema---------------------------------
+
+model NotificationEvent {
+  id            String         @id @default(uuid())
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @default(now()) @updatedAt
+  deleted_at    DateTime?
+  status        Int?           @default(1) @db.SmallInt
+  type          String?
+  text          String?
+  notifications Notification[]
+}
+
+model Notification {
+  id         String    @id @default(cuid())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  deleted_at DateTime?
+  read_at    DateTime?
+  status     Int?      @default(1) @db.SmallInt
+
+  sender_id String?
+  sender    User?   @relation("notificationSender", fields: [sender_id], references: [id])
+
+  receiver_id String?
+  receiver    User?   @relation("notificationReceiver", fields: [receiver_id], references: [id])
+
+  notification_event_id String?
+  notification_event    NotificationEvent? @relation(fields: [notification_event_id], references: [id])
+
+  entity_id String?
+}
+
+
+/*---------------------------------------------------------------------
+                      Chating and Notification Schema end
+---------------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------
+                      Role and Permission Schema start
+---------------------------------------------------------------------*/
+
 model Role {
   id         String    @id @default(cuid())
   created_at DateTime  @default(now())
@@ -126,9 +223,6 @@ model Role {
   status Int?    @default(1) @db.SmallInt
   title  String?
   name   String?
-
-  user_id String?
-  user    User?   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   permission_roles PermissionRole[]
   role_users       RoleUser[]
@@ -184,45 +278,15 @@ model RoleUser {
   @@map("role_users")
 }
 
-// this table stores notification event
-model NotificationEvent {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
+/*---------------------------------------------------------------------
+                      Role and Permission Schema end
+---------------------------------------------------------------------*/
 
-  status Int?    @default(1) @db.SmallInt
-  type   String?
-  text   String?
 
-  notifications Notification[]
 
-  @@map("notification_events")
-}
-
-model Notification {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-
-  read_at DateTime?
-
-  status Int? @default(1) @db.SmallInt
-
-  sender_id String?
-  sender    User?   @relation("sender", fields: [sender_id], references: [id])
-
-  receiver_id String?
-  receiver    User?   @relation("receiver", fields: [receiver_id], references: [id])
-
-  notification_event_id String?
-  notification_event    NotificationEvent? @relation(fields: [notification_event_id], references: [id])
-
-  entity_id String?
-
-  @@map("notifications")
-}
+/*---------------------------------------------------------------------
+                      Payment Schema start
+---------------------------------------------------------------------*/
 
 model UserPaymentMethod {
   id         String    @id @default(cuid())
@@ -265,87 +329,13 @@ model PaymentTransaction {
   @@map("payment_transactions")
 }
 
-// 
+/*---------------------------------------------------------------------
+                      Payment Schema end
+---------------------------------------------------------------------*/
 
-// ---------Start Chat schema---------
-
-enum MessageStatus {
-  SENT
-  DELIVERED
-  READ
-}
-
-model Conversation {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-
-  participant Participant[]
-  messages    Message[]
-
-  @@map("conversations")
-}
-
-// this table stores attachment of message
-model Attachment {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-
-  name     String?
-  type     String?
-  size     Int?
-  file     String?
-  file_alt String?
-
-  messages Message[]
-  hire_id  String?
-
-  @@map("attachments")
-}
-
-model Participant {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-
-  conversation_id String?
-  conversation    Conversation? @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-
-  user_id String?
-  user    User?   @relation("participantUser", fields: [user_id], references: [id], onDelete: Cascade)
-
-  role      String?   @default("participant")
-  joined_at DateTime? @default(now())
-
-  @@unique([conversation_id, user_id])
-  @@map("participants")
-}
-
-model Message {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-
-  conversation_id String?
-  conversation    Conversation? @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
-
-  sender_id    String?
-  receiver_id  String?
-  message      String?        @db.Text
-  status       MessageStatus? @default(SENT)
-  read_at      DateTime?
-  attachment   Attachment?    @relation(fields: [attachmentId], references: [id])
-  attachmentId String?
-
-  @@map("messages")
-}
-
-// ---------End Chat schema---------
+/*---------------------------------------------------------------------
+                      others Schema start
+---------------------------------------------------------------------*/
 
 model Faq {
   id         String    @id @default(cuid())
@@ -375,3 +365,7 @@ model Contact {
 
   @@map("contacts")
 }
+
+/*---------------------------------------------------------------------
+                      others Schema end
+---------------------------------------------------------------------*/

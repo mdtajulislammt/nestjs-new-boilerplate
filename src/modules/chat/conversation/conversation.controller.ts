@@ -23,39 +23,53 @@ import { Roles } from '../../../common/guard/role/roles.decorator';
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-
-
   // *create conversation
-  @Post()
+  @Post('create-conversation')
+  @ApiOperation({ summary: 'Create a new conversation' })
   async create(
     @Body() createConversationDto: CreateConversationDto,
-    @Req() req: any,
+    @Req() req,
   ) {
-    const userId = req.user.userId;
-    return this.conversationService.create(createConversationDto, userId);
+    const user = req.user.userId;
+    return this.conversationService.create(createConversationDto, user);
   }
 
-   //  *conversation list of user
+  //  *conversation list of user
   @Get('conversation-list') 
+  @ApiOperation({ summary: 'Get all conversations for the authenticated user' })
   async findAll(@Req() req) { 
+  
     const user = req.user.userId; 
+
     return this.conversationService.findAll(user);
   }
- 
-  // get conversation by id 
-  @Get('conversationById/:id')
-  async findOne(@Param('id') id: string) {
-    return this.conversationService.findOne(id);
+
+  // get conversation by id
+  @Get('single-conversation/:id')
+  @ApiOperation({ summary: 'Get a single conversation by ID' })
+  asyncfindOne(@Param('id') id: string, @Req() req) {
+    const user = req.user.userId;
+    return this.conversationService.findOne(id, user);
+  }
+
+  // delete conversation
+  // Delete a conversation by ID
+  @Delete('delete-conversation/:id')
+  @ApiOperation({ summary: 'Delete a conversation by ID' })
+  async remove(@Param('id') id: string, @Req() req) {
+    const user = req.user.userId;
+    return this.conversationService.remove(id, user);
   }
 
 
-  // *delete conversation
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.conversationService.remove(id);
+  // user information
+  @Get('all-user')
+  async findAllUser(
+    @Req() req,
+  ) {
+    const user = req.user.userId;
+    return this.conversationService.findAllUserInfo(user);
   }
-
-
 
 
 }

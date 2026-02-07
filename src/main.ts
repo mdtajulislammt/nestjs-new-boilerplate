@@ -10,7 +10,7 @@ import { join, resolve } from 'path';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { CustomExceptionFilter } from './common/exception/custom-exception.filter';
-import { TanvirStorage } from './common/lib/Disk/SojebStorage';
+import { TanvirStorage } from './common/lib/Disk/TanvirStorage';
 import appConfig from './config/app.config';
 import { PrismaExceptionFilter } from './common/exception/prisma-exception.filter';
 

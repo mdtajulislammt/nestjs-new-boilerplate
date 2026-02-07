@@ -7,7 +7,7 @@ import Redis from 'ioredis';
 //internal imports
 import { DateHelper } from '../../common/helper/date.helper';
 import { StringHelper } from '../../common/helper/string.helper';
-import { TanvirStorage } from '../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../common/lib/Disk/TanvirStorage';
 import { StripePayment } from '../../common/lib/Payment/stripe/StripePayment';
 import { UcodeRepository } from '../../common/repository/ucode/ucode.repository';
 import { UserRepository } from '../../common/repository/user/user.repository';
@@ -25,7 +25,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private ucodeRepository: UcodeRepository,
     @InjectRedis() private readonly redis: Redis,
-  ) {}
+  ) { }
 
   //
   async me(userId: string) {
@@ -204,9 +204,9 @@ export class AuthService {
       };
     }
   }
-  
+
   // update user 
-   async updateUser(
+  async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
     image?: Express.Multer.File,
@@ -215,13 +215,13 @@ export class AuthService {
       const data: any = {};
 
       if (updateUserDto.name) data.name = updateUserDto.name;
-      
+
       if (updateUserDto.first_name) data.first_name = updateUserDto.first_name;
-      
+
       if (updateUserDto.last_name) data.last_name = updateUserDto.last_name;
-      
+
       if (updateUserDto.address) data.address = updateUserDto.address;
-          
+
       if (image) {
         // delete old image from storage
         const oldImage = await this.prisma.user.findFirst({
@@ -243,6 +243,7 @@ export class AuthService {
 
         data.avatar = fileName;
       }
+      
       const user = await this.userRepository.getUserDetails(userId);
       if (user) {
         await this.prisma.user.update({
@@ -269,7 +270,6 @@ export class AuthService {
       };
     }
   }
-
 
   // done
   async forgotPassword(email) {
@@ -347,7 +347,7 @@ export class AuthService {
     }
   }
 
-  //
+  // done
   async verifyToken({ email, token }) {
     try {
       const user = await this.userRepository.exist({

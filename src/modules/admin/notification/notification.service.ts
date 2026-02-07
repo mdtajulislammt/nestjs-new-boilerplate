@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { TanvirStorage } from '../../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../../common/lib/Disk/TanvirStorage';
 import appConfig from '../../../config/app.config';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 import { UserType } from 'prisma/generated/client';

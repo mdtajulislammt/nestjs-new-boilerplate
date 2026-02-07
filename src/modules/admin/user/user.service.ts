@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 import appConfig from '../../../config/app.config';
-import { TanvirStorage } from '../../../common/lib/Disk/SojebStorage';
+import { TanvirStorage } from '../../../common/lib/Disk/TanvirStorage';
 import { DateHelper } from '../../../common/helper/date.helper';
 
 @Injectable()
