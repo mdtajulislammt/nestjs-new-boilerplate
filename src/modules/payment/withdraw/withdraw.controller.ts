@@ -6,111 +6,123 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   Req,
-  BadRequestException,
+  UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { WithdrawService } from './withdraw.service';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
-import { CreateDepositDto } from './dto/create-deposit.dto';
 import { UpdateWithdrawDto } from './dto/update-withdraw.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { UserRepository } from 'src/common/repository/user/user.repository';
 
-@UseGuards(JwtAuthGuard)
 @Controller('withdraw')
 export class WithdrawController {
   constructor(private readonly withdrawService: WithdrawService) {}
-  
-  // Stripe Account Connect
-  @Post('stripe-connect-account')
-  async createStripeConnectAccount(@Req() req: any) {
-    const userId = req.user.userId;
-    const email = req.user.email;
 
-    console.log(req.user);
+  // Stripe Connected Account 
+  @UseGuards(JwtAuthGuard)
+  @Post('create-connected-account')
+  async createConnectedAccount(@Req() req: any) {
+    try {
+   
+      const userId = req.user.userId;
+      const email = req.user.email;
 
-    const result = await this.withdrawService.createStripeConnectAccount(
-      userId,
-      email,
-    );
+      const result = await this.withdrawService.createConnectedAccount(
+        userId,
+        email,
+      );
 
-    return {
-      success: true,
-      message: 'Stripe Connect account created successfully',
-      data: result,
-    };
+      return {
+        success: true,
+        message: 'Connected account created successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   // Stripe Connect Onboarding Link
   @Post('onboarding/:accountId')
-  async createStripeOnboardingLink(@Param('accountId') accountId: string) {
-    const result =
-      await this.withdrawService.createStripeOnboardingLink(accountId);
+  async getOnboardingLink(@Param('accountId') accountId: string) {
+    try {
+      const result = await this.withdrawService.createOnboardingLink(accountId);
 
-    return {
-      success: true,
-      message: 'Stripe Onboarding link created successfully',
-      data: result,
-    };
+      return {
+        success: true,
+        message: 'Onboarding link created successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // Withdraw  Request
+  //Withdraw Request 
+  @UseGuards(JwtAuthGuard)
   @Post('request')
-  async createWithdrawRequest(
+  async requestWithdraw(
     @Req() req: any,
-    @Body() createWithdrawDto: CreateWithdrawDto,
+    @Body() withdrawDto: CreateWithdrawDto,
   ) {
-    const userId = req.user.id;
-
-    const result = await this.withdrawService.createWithdrawRequest(
-      userId,
-      createWithdrawDto,
-    );
-
-    return {
-      success: true,
-      message: 'Withdraw request created successfully',
-      data: result.data,
-    };
-  }
-
+    try {
+      const userId = req.user.userId;
   
+      const result = await this.withdrawService.processWithdraw(
+        userId,
+        withdrawDto,
+      );
 
-  //check Connect Account Balance
-  @Get('account-balance')
-  async getConnectedAccountBalance(@Req() req: any) {
-    const userId = req.user.userId;
-    const result =
-      await this.withdrawService.getConnectedAccountBalance(userId);
-
-    return {
-      success: true,
-      message: 'Connected account balance retrieved successfully',
-      data: result,
-    };
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // withdraw history
+
+  //Check Connected Account Balance
+  @UseGuards(JwtAuthGuard)
+  @Get('balance')
+  async checkBalance(@Req() req: any) {
+    try {
+      const userId = req.user.userId;
+      const result = await this.withdrawService.checkAccountBalance(userId);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+ //Withdraw History
+  @UseGuards(JwtAuthGuard)
   @Get('history')
   async getWithdrawHistory(@Req() req: any) {
-    const userId = req.user.userId;
-    const result = await this.withdrawService.getWithdrawHistory(userId);
-    return {
-      success: true,
-      message: 'Withdraw history retrieved successfully',
-      data: result,
-    };
+    try {
+      const userId = req.user.userId;
+      const result = await this.withdrawService.getWithdrawHistory(userId);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // account balance
+  //Get Connected Account Info
+  @UseGuards(JwtAuthGuard)
   @Get('account-info')
-  async getAccountBalance(@Req() req: any) {
-    const userId = req.user.userId;
-    return await this.withdrawService.getAccountInfo(userId);
-    
+  async getAccountInfo(@Req() req: any) {
+    try {
+      const userId = req.user.userId;
+      const result = await this.withdrawService.getConnectedAccountInfo(userId);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 
 
-  
 }
-
