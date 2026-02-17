@@ -3,25 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { PrismaClient } from '@prisma/client';
+import { TajulStorage } from 'src/common/lib/Disk/TajulStorage';
 import appConfig from '../../../config/app.config';
-import { DateHelper } from '../../../common/helper/date.helper';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { MessageGateway } from '../message/message.gateway';
-import { TanvirStorage } from 'src/common/lib/Disk/TanvirStorage';
+import { CreateConversationDto } from './dto/create-conversation.dto';
 
 @Injectable()
 export class ConversationService {
   constructor(
     private prisma: PrismaService,
     private readonly messageGateway: MessageGateway,
-  ) { }
+  ) {}
 
   // *create conversation
   async create(createConversationDto: CreateConversationDto, sender: string) {
-
     const { participant_id } = createConversationDto;
 
     if (participant_id === sender) {
@@ -62,9 +58,9 @@ export class ConversationService {
             name: p.user.name,
             avater: p.user.avatar,
             avatar_url: p.user.avatar
-              ? TanvirStorage.url(
-                `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
-              )
+              ? TajulStorage.url(
+                  `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
+                )
               : null,
           })),
         },
@@ -100,9 +96,9 @@ export class ConversationService {
         name: p.user.name,
         avater: p.user.avatar,
         avatar_url: p.user.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
-          )
+          ? TajulStorage.url(
+              `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
+            )
           : null,
       })),
     };
@@ -116,7 +112,6 @@ export class ConversationService {
 
   //  *conversation list of user
   async findAll(userId: string) {
-
     const conversations = await this.prisma.conversation.findMany({
       where: {
         participants: {
@@ -156,38 +151,39 @@ export class ConversationService {
     });
 
     const formattedConversations = conversations.map((conv) => {
-
       const opponentParticipant = conv.participants.find(
         (p) => p.userId !== userId,
       );
 
-      const opponentData = opponentParticipant ? {
-        userId: opponentParticipant.user.id,
-        name: opponentParticipant.user.name,
-        avater: opponentParticipant.user.avatar,
-        avatar_url: opponentParticipant.user.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${opponentParticipant.user.avatar}`,
-          )
-          : null,
-      }
+      const opponentData = opponentParticipant
+        ? {
+            userId: opponentParticipant.user.id,
+            name: opponentParticipant.user.name,
+            avater: opponentParticipant.user.avatar,
+            avatar_url: opponentParticipant.user.avatar
+              ? TajulStorage.url(
+                  `${appConfig().storageUrl.avatar}/${opponentParticipant.user.avatar}`,
+                )
+              : null,
+          }
         : null;
 
       return {
         conversation_id: conv.id,
         opponent: opponentData,
-        lastMessage: conv.messages[0] ? {
-          text: conv.messages[0].text,
-          createdAt: conv.messages[0].createdAt,
-          attachments: conv.messages[0].attachments,
-          attachment_urls: conv.messages[0].attachments
-            ? conv.messages[0].attachments.map((att) =>
-              TanvirStorage.url(
-                `${appConfig().storageUrl.attachment}/${att}`,
-              ),
-            )
-            : [],
-        }
+        lastMessage: conv.messages[0]
+          ? {
+              text: conv.messages[0].text,
+              createdAt: conv.messages[0].createdAt,
+              attachments: conv.messages[0].attachments,
+              attachment_urls: conv.messages[0].attachments
+                ? conv.messages[0].attachments.map((att) =>
+                    TajulStorage.url(
+                      `${appConfig().storageUrl.attachment}/${att}`,
+                    ),
+                  )
+                : [],
+            }
           : null,
       };
     });
@@ -252,9 +248,9 @@ export class ConversationService {
         name: p.user.name,
         avater: p.user.avatar,
         avatar_url: p.user.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
-          )
+          ? TajulStorage.url(
+              `${appConfig().storageUrl.avatar}/${p.user.avatar}`,
+            )
           : null,
       })),
       messages: conversation.messages.map((msg) => ({
@@ -265,9 +261,9 @@ export class ConversationService {
           id: msg.sender.id,
           name: msg.sender.name,
           avatar: msg.sender.avatar
-            ? TanvirStorage.url(
-              `${appConfig().storageUrl.avatar}/${msg.sender.avatar}`,
-            )
+            ? TajulStorage.url(
+                `${appConfig().storageUrl.avatar}/${msg.sender.avatar}`,
+              )
             : null,
         },
       })),
@@ -311,13 +307,11 @@ export class ConversationService {
     };
   }
 
-
   // user information
   async findAllUserInfo(userId: string) {
-    
     const users = await this.prisma.user.findMany({
       where: {
-        id: {not: userId},
+        id: { not: userId },
       },
       select: {
         id: true,
@@ -336,9 +330,7 @@ export class ConversationService {
       name: user.name,
       email: user.email,
       avatar: user.avatar
-        ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${user.avatar}`,
-          )
+        ? TajulStorage.url(`${appConfig().storageUrl.avatar}/${user.avatar}`)
         : null,
       type: user.type,
     }));
@@ -349,10 +341,4 @@ export class ConversationService {
       data: formattedUsers,
     };
   }
-
-
-
-
-
-
 }

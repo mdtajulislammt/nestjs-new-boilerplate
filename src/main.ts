@@ -3,33 +3,29 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as express from 'express';
 import helmet from 'helmet';
-import { join, resolve } from 'path';
+import { join } from 'path';
 // internal imports
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { CustomExceptionFilter } from './common/exception/custom-exception.filter';
-import { TanvirStorage } from './common/lib/Disk/TanvirStorage';
-import appConfig from './config/app.config';
 import { PrismaExceptionFilter } from './common/exception/prisma-exception.filter';
+import { TajulStorage } from './common/lib/Disk/TajulStorage';
+import appConfig from './config/app.config';
 
 async function bootstrap() {
- 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
 
- 
   app.useWebSocketAdapter(new IoAdapter(app));
   app.setGlobalPrefix('api');
   app.enableCors();
   app.use(helmet());
- 
 
-  app.useStaticAssets(join(__dirname, "..", "..", "public"), {
+  app.useStaticAssets(join(__dirname, '..', '..', 'public'), {
     index: false,
-    prefix: "/public",
+    prefix: '/public',
   });
 
   app.useGlobalPipes(
@@ -42,14 +38,14 @@ async function bootstrap() {
       },
     }),
   );
-  
+
   app.useGlobalFilters(
     new CustomExceptionFilter(),
-    new PrismaExceptionFilter(),  
+    new PrismaExceptionFilter(),
   );
 
   // storage setup
-  TanvirStorage.config({
+  TajulStorage.config({
     driver: 'local',
     connection: {
       rootUrl: appConfig().storageUrl.rootUrl,
@@ -73,7 +69,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api/docs', app, document);
- 
 
   await app.listen(process.env.PORT ?? 4000, '0.0.0.0');
 }

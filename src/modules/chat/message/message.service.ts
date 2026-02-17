@@ -2,15 +2,14 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from "@nestjs/common";
-import appConfig from "../../../config/app.config";
-import { CreateMessageDto } from "./dto/create-message.dto";
-import { PrismaService } from "../../../prisma/prisma.service";
-import { TanvirStorage } from '../../../common/lib/Disk/TanvirStorage';
-import { MessageGateway } from "./message.gateway";
-import { StringHelper } from "src/common/helper/string.helper";
-import { paginateResponse, PaginationDto } from "src/common/pagination";
-import { ChatRepository } from "../../../common/repository/chat/chat.repository";
+} from '@nestjs/common';
+import { StringHelper } from 'src/common/helper/string.helper';
+import { paginateResponse, PaginationDto } from 'src/common/pagination';
+import { TajulStorage } from '../../../common/lib/Disk/TajulStorage';
+import appConfig from '../../../config/app.config';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { CreateMessageDto } from './dto/create-message.dto';
+import { MessageGateway } from './message.gateway';
 
 // Temporary enum until Prisma generates it
 enum MessageStatus {
@@ -25,7 +24,7 @@ export class MessageService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly messageGateway: MessageGateway,
-  ) { }
+  ) {}
 
   // *Send message (with Prisma transaction)
   async create(
@@ -41,7 +40,7 @@ export class MessageService {
 
     if (!participant) {
       throw new UnauthorizedException(
-        "You are not a participant of this conversation.",
+        'You are not a participant of this conversation.',
       );
     }
 
@@ -51,7 +50,7 @@ export class MessageService {
     });
 
     if (!conversation) {
-      throw new NotFoundException("Conversation not found");
+      throw new NotFoundException('Conversation not found');
     }
 
     const savedFileNames: string[] = [];
@@ -59,8 +58,8 @@ export class MessageService {
     if (files && files.length > 0) {
       for (const file of files) {
         const fileName = `${StringHelper.randomString(8)}_${file.originalname}`;
-        await TanvirStorage.put(
-          appConfig().storageUrl.attachment + "/" + fileName,
+        await TajulStorage.put(
+          appConfig().storageUrl.attachment + '/' + fileName,
           file.buffer,
         );
         savedFileNames.push(fileName);
@@ -100,16 +99,16 @@ export class MessageService {
       status: message.status,
       attchment: message.attachments,
       attachments_url: (message.attachments || []).map((f) =>
-        TanvirStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
+        TajulStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
       ),
       sender: {
         id: message.sender.id,
         name: message.sender.name,
         email: message.sender.email,
         avatar: message.sender.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${message.sender.avatar}`,
-          )
+          ? TajulStorage.url(
+              `${appConfig().storageUrl.avatar}/${message.sender.avatar}`,
+            )
           : null,
       },
     };
@@ -121,12 +120,12 @@ export class MessageService {
       this.messageGateway.server
         .to(conversationId)
         .except(senderSocketId)
-        .emit("message", {
+        .emit('message', {
           from: sender,
           data: formatted,
         });
     } else {
-      this.messageGateway.server.to(conversationId).emit("message", {
+      this.messageGateway.server.to(conversationId).emit('message', {
         from: sender,
         data: formatted,
       });
@@ -139,7 +138,7 @@ export class MessageService {
     */
 
     return {
-      message: "Message sent successfully",
+      message: 'Message sent successfully',
       success: true,
       data: formatted,
     };
@@ -170,7 +169,7 @@ export class MessageService {
     });
 
     if (!conversation) {
-      throw new NotFoundException("Conversation not found");
+      throw new NotFoundException('Conversation not found');
     }
 
     const isParticipant = conversation.participants.some(
@@ -178,7 +177,7 @@ export class MessageService {
     );
     if (!isParticipant) {
       throw new UnauthorizedException(
-        "You are not a participant of this conversation.",
+        'You are not a participant of this conversation.',
       );
     }
 
@@ -193,9 +192,9 @@ export class MessageService {
         name: receiverParticipant.user.name,
         email: receiverParticipant.user.email,
         avatar_url: receiverParticipant.user.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${receiverParticipant.user.avatar}`,
-          )
+          ? TajulStorage.url(
+              `${appConfig().storageUrl.avatar}/${receiverParticipant.user.avatar}`,
+            )
           : null,
       };
     }
@@ -209,7 +208,7 @@ export class MessageService {
             select: { id: true, name: true, email: true, avatar: true },
           },
         },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
         skip,
         take,
       }),
@@ -217,7 +216,7 @@ export class MessageService {
 
     if (totalMessages === 0) {
       return {
-        message: "No messages found",
+        message: 'No messages found',
         success: true,
         data: paginateResponse([], page, perPage, totalMessages),
       };
@@ -228,7 +227,7 @@ export class MessageService {
       text: msg.text,
       attachments: msg.attachments,
       attachments_url: (msg.attachments || []).map((f) =>
-        TanvirStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
+        TajulStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
       ),
       createdAt: msg.createdAt,
       sender: {
@@ -237,9 +236,9 @@ export class MessageService {
         email: msg.sender.email,
         avater: msg.sender.avatar,
         avatar_url: msg.sender.avatar
-          ? TanvirStorage.url(
-            `${appConfig().storageUrl.avatar}/${msg.sender.avatar}`,
-          )
+          ? TajulStorage.url(
+              `${appConfig().storageUrl.avatar}/${msg.sender.avatar}`,
+            )
           : null,
       },
 
@@ -254,7 +253,7 @@ export class MessageService {
     );
 
     return {
-      message: "Messages retrieved successfully",
+      message: 'Messages retrieved successfully',
       success: true,
       ...paginationResult,
     };
@@ -270,24 +269,23 @@ export class MessageService {
     });
 
     if (!message) {
-      throw new NotFoundException("Message not found");
+      throw new NotFoundException('Message not found');
     }
 
     if (message.senderId !== userId) {
       throw new UnauthorizedException(
-        "You are not authorized to delete this message.",
+        'You are not authorized to delete this message.',
       );
     }
 
     await this.prisma.$transaction(async (tx) => {
-
       await tx.message.delete({
         where: { id: messageId },
       });
 
       if (message.attachments && message.attachments.length > 0) {
         for (const fname of message.attachments) {
-          await TanvirStorage.delete(
+          await TajulStorage.delete(
             `${appConfig().storageUrl.attachment}/${fname}`,
           );
         }
@@ -295,11 +293,10 @@ export class MessageService {
     });
 
     return {
-      message: "Message deleted successfully",
+      message: 'Message deleted successfully',
       success: true,
     };
   }
-
 
   // unread message count
   async getUnreadMessage(userId: string, conversationId: string) {
@@ -309,7 +306,7 @@ export class MessageService {
 
     if (!participant) {
       throw new UnauthorizedException(
-        "You are not a participant of this conversation.",
+        'You are not a participant of this conversation.',
       );
     }
 
@@ -326,7 +323,7 @@ export class MessageService {
       this.prisma.message.count({ where: whereClause }),
       this.prisma.message.findMany({
         where: whereClause,
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
         include: {
           sender: {
             select: { id: true, name: true, email: true, avatar: true },
@@ -340,12 +337,12 @@ export class MessageService {
       text: msg.text,
       senderName: msg.sender.name,
       attachments: (msg.attachments || []).map((f) =>
-        TanvirStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
+        TajulStorage.url(`${appConfig().storageUrl.attachment}/${f}`),
       ),
     }));
 
     return {
-      message: "Unread message count retrieved successfully",
+      message: 'Unread message count retrieved successfully',
       success: true,
       data: {
         count: unreadCount,
@@ -362,7 +359,7 @@ export class MessageService {
 
     if (!participant) {
       throw new UnauthorizedException(
-        "You are not a participant of this conversation.",
+        'You are not a participant of this conversation.',
       );
     }
 
@@ -373,10 +370,10 @@ export class MessageService {
         where: {
           conversationId,
           senderId: { not: userId },
-          status: { not: "READ" },
+          status: { not: 'READ' },
           createdAt: { gt: lastReadAt },
         },
-        data: { status: "READ" },
+        data: { status: 'READ' },
       });
 
       await tx.participant.update({
@@ -386,10 +383,8 @@ export class MessageService {
     });
 
     return {
-      message: "Messages marked as read successfully",
+      message: 'Messages marked as read successfully',
       success: true,
     };
   }
-
-
 }

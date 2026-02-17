@@ -1,15 +1,15 @@
+import { DiskOption, DiskType } from './Option';
 import { StorageClass } from './StorageClass';
 import { LocalAdapter } from './drivers/LocalAdapter';
-import { DiskOption, DiskType } from './Option';
 import { S3Adapter } from './drivers/S3Adapter';
 import { IStorage } from './drivers/iStorage';
 
 /**
- * SojebStorage for handling storage (local storage, aws s3 storage)
- * @class SojebStorage
- * @author Sojeb Sikder <sojebsikder@gmail.com>
+ * TajulStorage for handling storage (local storage, aws s3 storage)
+ * @class TajulStorage
+ * @author Tajul Islam <dev.tajulislam505@gmail.com>
  */
-export class TanvirStorage {
+export class TajulStorage {
   private static _config: DiskOption;
 
   /**

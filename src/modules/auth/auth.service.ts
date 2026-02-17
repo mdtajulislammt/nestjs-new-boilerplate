@@ -5,9 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import Redis from 'ioredis';
 
 //internal imports
-import { DateHelper } from '../../common/helper/date.helper';
 import { StringHelper } from '../../common/helper/string.helper';
-import { TanvirStorage } from '../../common/lib/Disk/TanvirStorage';
+import { TajulStorage } from '../../common/lib/Disk/TajulStorage';
 import { StripePayment } from '../../common/lib/Payment/stripe/StripePayment';
 import { UcodeRepository } from '../../common/repository/ucode/ucode.repository';
 import { UserRepository } from '../../common/repository/user/user.repository';
@@ -25,7 +24,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private ucodeRepository: UcodeRepository,
     @InjectRedis() private readonly redis: Redis,
-  ) { }
+  ) {}
 
   //
   async me(userId: string) {
@@ -52,7 +51,7 @@ export class AuthService {
       }
 
       if (user.avatar) {
-        user['avatar_url'] = TanvirStorage.url(
+        user['avatar_url'] = TajulStorage.url(
           appConfig().storageUrl.avatar + '/' + user.avatar,
         );
       }
@@ -175,7 +174,6 @@ export class AuthService {
 
       const payload = { email: email, sub: userId, type: user?.type };
 
-
       const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
@@ -205,7 +203,7 @@ export class AuthService {
     }
   }
 
-  // update user 
+  // update user
   async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
@@ -229,21 +227,21 @@ export class AuthService {
           select: { avatar: true },
         });
         if (oldImage.avatar) {
-          await TanvirStorage.delete(
+          await TajulStorage.delete(
             appConfig().storageUrl.avatar + '/' + oldImage.avatar,
           );
         }
 
         // upload file
         const fileName = `${StringHelper.randomString()}_${image.originalname}`;
-        await TanvirStorage.put(
+        await TajulStorage.put(
           appConfig().storageUrl.avatar + '/' + fileName,
           image.buffer,
         );
 
         data.avatar = fileName;
       }
-      
+
       const user = await this.userRepository.getUserDetails(userId);
       if (user) {
         await this.prisma.user.update({

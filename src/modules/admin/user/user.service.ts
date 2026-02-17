@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { DateHelper } from '../../../common/helper/date.helper';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 import appConfig from '../../../config/app.config';
-import { TanvirStorage } from '../../../common/lib/Disk/TanvirStorage';
-import { DateHelper } from '../../../common/helper/date.helper';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { TajulStorage } from 'src/common/lib/Disk/TajulStorage';
 
 @Injectable()
 export class UserService {
@@ -115,7 +115,7 @@ export class UserService {
 
       // add avatar url to user
       if (user.avatar) {
-        user['avatar_url'] = TanvirStorage.url(
+        user['avatar_url'] = TajulStorage.url(
           appConfig().storageUrl.avatar + '/' + user.avatar,
         );
       }

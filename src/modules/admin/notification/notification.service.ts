@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { TanvirStorage } from '../../../common/lib/Disk/TanvirStorage';
-import appConfig from '../../../config/app.config';
-import { UserRepository } from '../../../common/repository/user/user.repository';
 import { UserType } from 'prisma/generated/client';
+import { TajulStorage } from '../../../common/lib/Disk/TajulStorage';
+import { UserRepository } from '../../../common/repository/user/user.repository';
+import appConfig from '../../../config/app.config';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class NotificationService {
@@ -67,14 +67,16 @@ export class NotificationService {
       if (notifications.length > 0) {
         for (const notification of notifications) {
           if (notification.sender && notification.sender.avatar) {
-            notification.sender['avatar_url'] = TanvirStorage.url(
+            notification.sender['avatar_url'] = TajulStorage.url(
               appConfig().storageUrl.avatar + '/' + notification.sender.avatar,
             );
           }
 
           if (notification.receiver && notification.receiver.avatar) {
-            notification.receiver['avatar_url'] = TanvirStorage.url(
-              appConfig().storageUrl.avatar + '/' + notification.receiver.avatar,
+            notification.receiver['avatar_url'] = TajulStorage.url(
+              appConfig().storageUrl.avatar +
+                '/' +
+                notification.receiver.avatar,
             );
           }
         }
