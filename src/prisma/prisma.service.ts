@@ -5,7 +5,7 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import appConfig from '../config/app.config';
-import { PrismaClient } from 'prisma/generated/client';
+import { PrismaClient } from 'prisma/generated';
 
 @Injectable()
 export class PrismaService
@@ -13,22 +13,26 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
+constructor() {
+  const datasourceUrl = appConfig().database.url;
 
-  constructor() {
-    const datasourceUrl = appConfig().database.url;
-
-    if (!datasourceUrl) {
-      throw new Error('DATABASE_URL is not defined in environment variables');
-    }
-
-    super({
-      datasourceUrl,
-    });
-
-    if (process.env.PRISMA_ENV == '1') {
-      this.logger.log('Prisma Middleware disabled');
-    }
+  if (!datasourceUrl) {
+    throw new Error('DATABASE_URL is not defined');
   }
+
+  super({
+    datasources: {
+      db: {
+        url: datasourceUrl,
+      },
+    },
+    log: ['error'],
+  });
+
+  if (process.env.PRISMA_ENV === '1') {
+    this.logger.log('Prisma Middleware disabled');
+  }
+}
 
   async onModuleInit() {
     try {

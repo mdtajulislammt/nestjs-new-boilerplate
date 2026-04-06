@@ -4,13 +4,16 @@ import {
   ExceptionFilter,
   HttpStatus,
 } from '@nestjs/common';
-import {
+import { Prisma } from 'prisma/generated';
+
+const {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
   PrismaClientValidationError,
   PrismaClientInitializationError,
   PrismaClientRustPanicError,
-} from '@prisma/client/runtime/library';
+} = Prisma;
+
 import { Response } from 'express';
 
 @Catch(

@@ -5,13 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
-import { Prisma, RequestStatus, UserType } from 'prisma/generated';
 import { TajulStorage } from 'src/common/lib/Disk/TajulStorage';
 import { NotificationRepository } from 'src/common/repository/notification/notification.repository';
 import appConfig from 'src/config/app.config';
 import { MessageGateway } from 'src/modules/chat/message/message.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFeedbackDto, CreateRequestDto } from './dto/create-request.dto';
+import { Prisma, RequestStatus, UserType } from 'prisma/generated';
 
 @Injectable()
 export class RequestService {
