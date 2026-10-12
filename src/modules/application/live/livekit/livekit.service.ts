@@ -17,12 +17,13 @@ export class LivekitService {
 
   constructor() {
     // URL format fix: Twirp RPC requires https/http, not wss/ws
-    const httpUrl = this.rawUrl.replace('wss://', 'https://').replace('ws://', 'http://');
+    const raw = this.rawUrl || 'http://localhost:7880';
+    const httpUrl = raw.replace('wss://', 'https://').replace('ws://', 'http://');
 
     this.egressClient = new EgressClient(
       httpUrl,
-      this.apiKey,
-      this.apiSecret,
+      this.apiKey || 'devkey',
+      this.apiSecret || 'secret',
     );
   }
 

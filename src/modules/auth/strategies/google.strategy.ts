@@ -7,9 +7,12 @@ import appConfig from '../../../config/app.config';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
     super({
-      clientID: appConfig().auth.google.app_id,
-      clientSecret: appConfig().auth.google.app_secret,
-      callbackURL: appConfig().auth.google.callback,
+      clientID: appConfig().auth.google.app_id || 'dummy_google_client_id',
+      clientSecret:
+        appConfig().auth.google.app_secret || 'dummy_google_client_secret',
+      callbackURL:
+        appConfig().auth.google.callback ||
+        'http://localhost:4000/api/auth/google/redirect',
       scope: ['email', 'profile'],
     });
   }

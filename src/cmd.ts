@@ -1,12 +1,20 @@
-// external imports
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { CommandFactory } from 'nest-commander';
-// internal imports
+import appConfig from './config/app.config';
 import { PrismaService } from './prisma/prisma.service';
 import { SeedCommand } from './command/seed.command';
+import { UserRepository } from './common/repository/user/user.repository';
 
 @Module({
-  providers: [SeedCommand, PrismaService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [appConfig],
+    }),
+  ],
+  providers: [SeedCommand, PrismaService, UserRepository],
 })
 export class AppModule {}
 
